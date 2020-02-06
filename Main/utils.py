@@ -4,7 +4,7 @@ import re
 
 class MoviesFileEditor:
     PATH = 'data/movies.csv'
-    YEAR_REGEX = ''
+    YEAR_REGEX = r'\((\d{4})\)'
     GENRES_REGEX = ''
 
     @staticmethod
@@ -18,10 +18,16 @@ class MoviesFileEditor:
 
     def run(self) -> dict:
         data = self.csv_file_to_dict(self.PATH)
+        for key in data.keys():
+            year = self.extract_year(data[key])
+            if year:
+                data[key]['year'] = year
         return data
 
     def extract_year(self, item):
-        pass
+        match = re.findall(self.YEAR_REGEX, item['title'])
+        result = match[0] if match else None
+        return result
 
     def extract_genres(self, item):
         pass
