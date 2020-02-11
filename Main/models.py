@@ -11,20 +11,20 @@ class Movie(models.Model):
 
 
 class Link(models.Model):
-    movie_id = models.OneToOneField(Movie.movie_id, on_delete=models.CASCADE)
+    movie_id = models.OneToOneField(Movie, on_delete=models.CASCADE)
     imdb_id = models.PositiveIntegerField(null=True, blank=True)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
 
 
 class Rating(models.Model):
     user_id = models.PositiveIntegerField()
-    movie_id = models.OneToOneField(Movie.movie_id, on_delete=models.CASCADE)
+    movie_id = models.OneToOneField(Movie, on_delete=models.CASCADE)
     rating = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(5.0)])
     timestamp = models.PositiveIntegerField(null=True, blank=True)
 
 
 class Tag(models.Model):
     user_id = models.PositiveIntegerField()
-    movie_id = models.OneToOneField(Movie.movie_id, on_delete=models.CASCADE)
+    movie_id = models.OneToOneField(Movie, on_delete=models.CASCADE)
     tag = models.CharField(max_length=100)
     timestamp = models.PositiveIntegerField(null=True, blank=True)
