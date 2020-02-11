@@ -5,7 +5,7 @@ import re
 class MoviesFileEditor:
     PATH = 'data/movies.csv'
     YEAR_REGEX = r'\((\d{4})\)'
-    GENRES_REGEX = ''
+    SPLIT_SYMBOL = '|'
 
     @staticmethod
     def csv_file_to_dict(path: str) -> dict:
@@ -22,6 +22,7 @@ class MoviesFileEditor:
             year = self.extract_year(data[key])
             if year:
                 data[key]['year'] = year
+            data[key]['genres'] = self.extract_genres(data[key])
         return data
 
     def extract_year(self, item):
@@ -30,7 +31,7 @@ class MoviesFileEditor:
         return result
 
     def extract_genres(self, item):
-        pass
+        return item['genres'].split(self.SPLIT_SYMBOL)
 
 
 print(MoviesFileEditor().run())
