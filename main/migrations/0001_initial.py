@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('user_id', models.PositiveIntegerField()),
                 ('tag', models.CharField(max_length=100)),
                 ('timestamp', models.PositiveIntegerField(blank=True, null=True)),
-                ('movie_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='Main.Movie')),
+                ('movie_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='main.Movie')),
             ],
         ),
         migrations.CreateModel(
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('user_id', models.PositiveIntegerField()),
                 ('rating', models.FloatField(validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(5.0)])),
                 ('timestamp', models.PositiveIntegerField(blank=True, null=True)),
-                ('movie_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='Main.Movie')),
+                ('movie_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='main.Movie')),
             ],
         ),
         migrations.CreateModel(
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('imdb_id', models.PositiveIntegerField(blank=True, null=True)),
                 ('tmdb_id', models.PositiveIntegerField(blank=True, null=True)),
-                ('movie_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='Main.Movie')),
+                ('movie_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='main.Movie')),
             ],
         ),
     ]

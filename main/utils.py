@@ -1,8 +1,9 @@
 import pandas as pd
 import re
+from .models import Movie, Link, Rating, Tag
 
 
-class MoviesFileEditor:
+class MoviesFilePreprocessor:
     PATH = 'data/movies.csv'
     YEAR_REGEX = r'\((\d{4})\)'
     SPLIT_SYMBOL = '|'
@@ -34,4 +35,12 @@ class MoviesFileEditor:
         return item['genres'].split(self.SPLIT_SYMBOL)
 
 
-print(MoviesFileEditor().run())
+def update_movie_table():
+    data = MoviesFilePreprocessor().run()
+    if Movie.objects.all():
+        Movie.objects.all().delete()
+    movie_objects = [
+        Movie(movie_id=key, title=data[key]['title'], year=data[key]['year'], genres=data[key]['genres'])
+        for key in data.keys()
+    ]
+    Movie.objects.bulk_create(movie_objects)
