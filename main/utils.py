@@ -1,16 +1,17 @@
 import pandas as pd
 import re
 from .models import Movie, Link, Rating, Tag
-
+import os
 
 class MoviesFilePreprocessor:
-    PATH = 'data/movies.csv'
+    PATH = 'main/data/movies.csv'
     YEAR_REGEX = r'\((\d{4})\)'
     SPLIT_SYMBOL = '|'
 
     @staticmethod
     def csv_file_to_dict(path: str) -> dict:
         data = {}
+        print(os.getcwd())
         try:
             data = pd.read_csv(path).set_index('movieId').to_dict('index')
         except FileNotFoundError as e:
@@ -23,6 +24,8 @@ class MoviesFilePreprocessor:
             year = self.extract_year(data[key])
             if year:
                 data[key]['year'] = year
+            else:
+                data[key]['year'] = None
             data[key]['genres'] = self.extract_genres(data[key])
         return data
 
