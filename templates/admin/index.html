@@ -57,7 +57,13 @@
 <div id="content-related">
     <div class="module" id="recent-actions-module">
         <h2>{% trans 'TASKS' %}</h2>
-        <li><a href={% url 'run_admin_task' task_name='update_movie_table_task' %}/>Update Movie table</li>
+        <ul>
+{#            <li><a href={% url 'run_admin_task' task_name='update_movie_tables_task' %}/><b>Update Movie tables</b></li>#}
+            <li><a href={% url 'run_admin_task' task_name='update_movie_table_task' %}/>Update Movie table</li>
+            <li><a href={% url 'run_admin_task' task_name='update_link_table_task' %}/>Update Link table</li>
+            <li><a href={% url 'run_admin_task' task_name='update_rating_table_task' %}/>Update Rating table</li>
+            <li><a href={% url 'run_admin_task' task_name='update_tag_table_task' %}/>Update Tag table</li>
+        </ul>
     </div>
 </div>
 {% endblock %}

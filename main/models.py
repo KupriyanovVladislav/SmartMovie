@@ -17,7 +17,7 @@ class Link(models.Model):
     class Meta:
         ordering = ['movie_id']
 
-    movie_id = models.OneToOneField(Movie, on_delete=models.CASCADE, primary_key=True)
+    movie = models.OneToOneField(Movie, on_delete=models.CASCADE, primary_key=True)
     imdb_id = models.PositiveIntegerField(null=True, blank=True)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
 
@@ -27,7 +27,7 @@ class Rating(models.Model):
         ordering = ['user_id', 'movie_id']
 
     user_id = models.PositiveIntegerField()
-    movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     rating = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(5.0)])
     timestamp = models.PositiveIntegerField(null=True, blank=True)
 
@@ -37,6 +37,6 @@ class Tag(models.Model):
         ordering = ['user_id', 'movie_id']
 
     user_id = models.PositiveIntegerField()
-    movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     tag = models.CharField(max_length=127)
     timestamp = models.PositiveIntegerField(null=True, blank=True)

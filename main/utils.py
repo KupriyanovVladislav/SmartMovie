@@ -1,7 +1,8 @@
 import pandas as pd
 import re
 from .models import Movie, Link, Rating, Tag
-import os
+import csv
+
 
 class MoviesFilePreprocessor:
     PATH = 'main/data/movies.csv'
@@ -11,7 +12,6 @@ class MoviesFilePreprocessor:
     @staticmethod
     def csv_file_to_dict(path: str) -> dict:
         data = {}
-        print(os.getcwd())
         try:
             data = pd.read_csv(path).set_index('movieId').to_dict('index')
         except FileNotFoundError as e:
@@ -47,3 +47,56 @@ def update_movie_table():
         for key in data.keys()
     ]
     Movie.objects.bulk_create(movie_objects)
+
+
+def update_link_table():
+    if Link.objects.all():
+        Link.objects.all().delete()
+    with open('main/data/links.csv') as f:
+        reader = csv.reader(f)
+        next(reader)
+        link_objects = [
+            Link(
+                movie_id=row[0],
+                imdb_id=row[1] if row[1] else None,
+                tmdb_id=row[2] if row[2] else None
+            )
+            for row in reader
+        ]
+        Link.objects.bulk_create(link_objects)
+
+
+def update_rating_table():
+    if Rating.objects.all():
+        Rating.objects.all().delete()
+    with open('main/data/ratings.csv') as f:
+        reader = csv.reader(f)
+        next(reader)
+        rating_objects = [
+            Rating(
+                user_id=row[0],
+                movie_id=row[1],
+                rating=row[2],
+                timestamp=row[3] if row[3] else None
+            )
+            for row in reader
+        ]
+        Rating.objects.bulk_create(rating_objects)
+
+
+def update_tag_table():
+    if Tag.objects.all():
+        Tag.objects.all().delete()
+    with open('main/data/tags.csv') as f:
+        reader = csv.reader(f)
+        next(reader)
+        tag_objects = [
+            Tag(
+                user_id=row[0],
+                movie_id=row[1],
+                tag=row[2] if row[2] else None,
+                timestamp=row[3] if row[3] else None
+            )
+            for row in reader
+        ]
+        Tag.objects.bulk_create(tag_objects)

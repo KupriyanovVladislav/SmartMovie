@@ -125,8 +125,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-APPEND_SLASH = False
-
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'

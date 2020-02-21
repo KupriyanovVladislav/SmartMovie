@@ -1,37 +1,45 @@
 import logging
-from celery import task
-from .utils import update_movie_table
+from celery import task, chain
+from .utils import update_movie_table, update_link_table,\
+    update_rating_table, update_tag_table
+
+from SmartMovie.celery import celery_app
 
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
 
-@task(ignore_result=True)
+@celery_app.task(ignore_result=True)
 def adding_task(x, y):
     return x + y
 
 
-@task(ignore_result=True)
+@celery_app.task(ignore_result=True)
 def update_movie_table_task():
     update_movie_table()
 
 
-@task(ignore_result=True)
+@celery_app.task(ignore_result=True)
 def update_link_table_task():
-    pass
+    update_link_table()
 
 
-@task(ignore_result=True)
+@celery_app.task(ignore_result=True)
 def update_rating_table_task():
-    pass
+    update_rating_table()
 
 
-@task(ignore_result=True)
+@celery_app.task(ignore_result=True)
 def update_tag_table_task():
-    pass
+    update_tag_table()
 
 
-@task(ignore_result=True)
+@celery_app.task(ignore_result=True)
 def update_movie_tables_task():
-    pass
+    update_movie_table_task()
+    chain(
+        update_link_table_task(),
+        update_rating_table_task(),
+        update_tag_table_task()
+    ).apply_async()
