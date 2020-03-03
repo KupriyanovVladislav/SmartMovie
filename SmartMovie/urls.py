@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 import main.admin_views as admin_views
 import main.views as views
 
@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^admin_task/(?P<task_name>\w+)', admin_views.run_task, name='run_admin_task'),
     path('', views.Index.as_view(), name='index'),
+    path('api/', include('main.urls')),
 ]
