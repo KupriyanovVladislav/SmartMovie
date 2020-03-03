@@ -1,3 +1,6 @@
 {% extends 'main/base.html' %}
-{% block navbar %} {% include 'main/navbar.html' %} {% endblock %}
-{% block body %} {% include 'main/carousel.html' %} {% endblock %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+{% block body %}
+    <h1>Hello world!</h1>
+{% endblock %}
