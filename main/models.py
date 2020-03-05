@@ -23,7 +23,7 @@ class Link(models.Model):
     def __str__(self):
         return f'{self.movie}'
 
-    movie = models.OneToOneField(Movie, on_delete=models.CASCADE, primary_key=True)
+    movie = models.OneToOneField(Movie, related_name='links', on_delete=models.CASCADE, primary_key=True)
     imdb_id = models.PositiveIntegerField(null=True, blank=True)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
 

@@ -8,7 +8,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from .models import Movie
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from .serializers import MovieSerializer, UserSerializer
 
 
@@ -59,7 +59,12 @@ class CreateUserView(CreateAPIView):
 
 class LoginView(APIView):
     def post(self, request):
+        success = False
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
-        return Response({'success': True if user else False})
+        if user:
+            success = True
+            login(request, user)
+
+        return Response({'success': success})

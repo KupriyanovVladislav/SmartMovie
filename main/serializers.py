@@ -1,12 +1,21 @@
 from rest_framework import serializers
-from .models import Movie
+from .models import Movie, Link
 from django.contrib.auth.models import User
 
 
+class LinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Link
+        fields = ('imdb_id', 'tmdb_id')
+
+
 class MovieSerializer(serializers.ModelSerializer):
+    links = LinkSerializer(read_only=True)
+
     class Meta:
         model = Movie
-        fields = '__all__'
+        depth = 1
+        fields = ('movie_id', 'title', 'year', 'genres', 'links')
 
 
 class UserSerializer(serializers.ModelSerializer):
