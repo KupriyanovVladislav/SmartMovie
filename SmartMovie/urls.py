@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^admin_task/(?P<task_name>\w+)', admin_views.run_task, name='run_admin_task'),
     path('', views.Index.as_view(), name='index'),
-    path('api/', include('main.urls')),
+    path('', include('main.urls')),
 ]
