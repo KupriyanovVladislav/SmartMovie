@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Movie, Link
-from django.contrib.auth.models import User
+from .models import User
+from rest_framework_jwt.settings import api_settings
 
 
 class LinkSerializer(serializers.ModelSerializer):
@@ -19,21 +20,34 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'email', 'first_name', 'last_name')
-        write_only_fields = ('password', )
-        read_only_fields = ('id', )
+        fields = ('email',)
+
+
+class UserSerializerWithToken(serializers.ModelSerializer):
+
+    token = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('token', 'email', 'password')
+
+    def get_token(self, obj):
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+        payload = jwt_payload_handler(obj)
+        token = jwt_encode_handler(payload)
+        return token
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
-        )
-
-        user.set_password(validated_data['password'])
-        user.save()
-
-        return user
+        password = validated_data['password']
+        instance = self.Meta.model(**validated_data)
+        instance.clean_fields()
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance

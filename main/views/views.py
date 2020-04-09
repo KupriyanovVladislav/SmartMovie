@@ -4,11 +4,8 @@ from django.views import View
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from main.models import Movie
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
 from main.serializers import MovieSerializer, UserSerializer
 
 

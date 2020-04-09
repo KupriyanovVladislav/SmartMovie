@@ -1,52 +1,40 @@
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from main.serializers import UserSerializer
+from main.serializers import UserSerializerWithToken, UserSerializer
+from rest_framework.decorators import api_view
+from rest_framework import permissions, status
+from django.core.exceptions import ValidationError
 
 
-class CreateUserView(CreateAPIView):
+@api_view(['GET'])
+def current_user(request):
     """
-    API for creating User
+    Determine the current user by their token, and return their data
     """
-    model = User
-    serializer_class = UserSerializer
+
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
 
 
-class LoginView(APIView):
+class UserList(APIView):
     """
-    API for login not authorized USER
+    Create a new user. It's called 'UserList' because normally we'd have a get
+    method here too, for retrieving a list of all User objects.
     """
-    def post(self, request):
-        success, message = False, ''
-        if request.user.is_anonymous:
-            username = request.data.get('username')
-            password = request.data.get('password')
-            user = authenticate(username=username, password=password)
-            if user:
-                success, message = True, 'You successfully login'
-                login(request, user)
-        else:
-            message = 'You have already been authorized'
 
-        return Response({'success': success, 'message': message})
+    permission_classes = (permissions.AllowAny,)
 
+    def post(self, request, format=None):
+        serializer = UserSerializerWithToken(data=request.data)
 
-class LogOutView(APIView):
-    """
-    API for logout authorized USER
-    """
-    def get(self, request):
-        success, message = False, ''
-        if request.user.is_authenticated:
-            logout(request)
-            success, message = True, "You successfully logout"
-        else:
-            message = "You haven't been authorized"
+        # It validates email
+        if serializer.is_valid():
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response({'success': success, 'message': message})
+            # If password is incorrect
+            except ValidationError as exc:
+                return Response(exc.message_dict, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ResetPasswordView(APIView):
-    pass
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

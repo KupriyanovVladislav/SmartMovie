@@ -2,6 +2,7 @@ import pandas as pd
 import re
 from .models import Movie, Link, Rating, Tag
 import csv
+from .serializers import UserSerializer
 
 
 class MoviesFilePreprocessor:
@@ -100,3 +101,10 @@ def update_tag_table():
             for row in reader
         ]
         Tag.objects.bulk_create(tag_objects)
+
+
+def my_jwt_response_handler(token, user=None, request=None):
+    return {
+        'token': token,
+        'user': UserSerializer(user, context={'request': request}).data
+    }
