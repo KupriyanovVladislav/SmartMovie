@@ -1,8 +1,8 @@
 import pandas as pd
 import re
-from .models import Movie, Link, Rating, Tag
+from main.models import Movie, Link, Rating, Tag
 import csv
-from .serializers import UserSerializer
+from main.serializers import UserSerializer
 
 
 class MoviesFilePreprocessor:

@@ -1,9 +1,13 @@
+import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from main.serializers import UserSerializerWithToken, UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework import permissions, status
 from django.core.exceptions import ValidationError
+
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])

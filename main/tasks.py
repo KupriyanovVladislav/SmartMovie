@@ -1,6 +1,6 @@
 import logging
-from celery import task, chain
-from .utils import update_movie_table, update_link_table,\
+from celery import chain
+from main.utils.utils import update_movie_table, update_link_table,\
     update_rating_table, update_tag_table
 
 from SmartMovie.celery import celery_app
