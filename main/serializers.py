@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Movie, Link
 from .models import User
 from rest_framework_jwt.settings import api_settings
+from .utils.tmdbApi import TmdbAPI
 
 
 class LinkSerializer(serializers.ModelSerializer):
@@ -12,11 +13,19 @@ class LinkSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     links = LinkSerializer(read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
         depth = 1
-        fields = ('movie_id', 'title', 'year', 'genres', 'links')
+        fields = ('movie_id', 'title', 'year', 'genres', 'links', 'image')
+
+    def get_image(self, obj):
+        movie_details = TmdbAPI().get_movie_details(obj.links.tmdb_id)
+        image = None
+        if 'image_url' in movie_details:
+            image = movie_details['image_url']
+        return image
 
 
 class UserSerializer(serializers.ModelSerializer):

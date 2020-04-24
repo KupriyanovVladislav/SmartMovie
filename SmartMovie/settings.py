@@ -150,7 +150,7 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'main.utils.my_jwt_response_handler',
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'main.utils.utils.my_jwt_response_handler',
     'JWT_VERIFY_EXPIRATION': False,
 }
 
@@ -169,15 +169,18 @@ LOGGING = {
         'level': 'WARNING',
     },
     'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
         'django.db.backends': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
-        }
+        },
     },
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
