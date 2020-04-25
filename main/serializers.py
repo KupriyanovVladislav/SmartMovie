@@ -13,19 +13,41 @@ class LinkSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     links = LinkSerializer(read_only=True)
-    image = serializers.SerializerMethodField()
+    backdrop_path = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
         depth = 1
-        fields = ('movie_id', 'title', 'year', 'genres', 'links', 'image')
+        fields = ('movie_id', 'title', 'year', 'genres', 'links', 'backdrop_path')
 
-    def get_image(self, obj):
+    def get_backdrop_path(self, obj):
         movie_details = TmdbAPI().get_movie_details(obj.links.tmdb_id)
         image = None
-        if 'image_url' in movie_details:
-            image = movie_details['image_url']
+        if 'backdrop_path' in movie_details:
+            image = movie_details['backdrop_path']
         return image
+
+
+class MovieMoreInfoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
+        fields = ('movie_id', 'title', 'year', 'genres', 'links', 'poster_path', 'overview', 'release_date', 'budget')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tmdb_api_handler = TmdbAPI()
+
+    def to_representation(self, instance: Movie):
+        result = {}
+        tmdb_data = self.tmdb_api_handler.get_movie_details(instance.links.tmdb_id, more=True)
+        for field in self.Meta.fields:
+            if hasattr(instance, field):
+                result[field] = getattr(instance, field)
+            else:
+                result[field] = tmdb_data.get(field, None)
+        result['links'] = LinkSerializer(result['links']).data
+        return result
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -7,7 +7,7 @@ from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from main.models import Movie
-from main.serializers import MovieSerializer, UserSerializer
+from main.serializers import MovieSerializer, MovieMoreInfoSerializer
 from django.core.cache import cache
 
 
@@ -35,7 +35,7 @@ class MovieDetail(APIView):
     """
     Retrieve, update or delete a Movie instance
     """
-    # permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get_object(self, pk):
         try:
@@ -45,7 +45,7 @@ class MovieDetail(APIView):
 
     def get(self, request, pk, format=None):
         movie = self.get_object(pk)
-        serializer = MovieSerializer(movie)
+        serializer = MovieMoreInfoSerializer(movie)
         return Response(serializer.data)
 
     def delete(self, request, pk, format=None):
