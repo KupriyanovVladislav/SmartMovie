@@ -38,7 +38,10 @@ class TmdbAPI:
     def _composite_movie_data(self, data: dict, more: bool):
         result = {}
         if more:
-            fields = ('poster_path', 'overview', 'release_date', 'budget')
+            fields = (
+                'poster_path', 'overview', 'release_date', 'budget',
+                'runtime', 'production_countries', 'vote_average',
+            )
             for field in fields:
                 result[field] = data.get(field, None)
             if result['poster_path']:

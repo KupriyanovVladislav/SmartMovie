@@ -32,7 +32,11 @@ class MovieMoreInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = ('movie_id', 'title', 'year', 'genres', 'links', 'poster_path', 'overview', 'release_date', 'budget')
+        fields = (
+            'movie_id', 'title', 'year', 'genres', 'links',
+            'poster_path', 'overview', 'release_date', 'budget',
+            'runtime', 'production_countries', 'vote_average'
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
