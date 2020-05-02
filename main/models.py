@@ -131,3 +131,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.email
+
+
+class Bookmark(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    timestamp = models.PositiveIntegerField(null=True, blank=True)
