@@ -42,6 +42,7 @@ class Rating(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     rating = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(5.0)])
     timestamp = models.PositiveIntegerField(null=True, blank=True)
+    is_archived = models.BooleanField(default=True)
 
 
 class Tag(models.Model):

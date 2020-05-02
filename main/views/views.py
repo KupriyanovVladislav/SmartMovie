@@ -1,9 +1,8 @@
 import logging
 from django.http import HttpResponse, Http404
-from rest_framework import status
+from rest_framework import status, filters, permissions, generics
 from django.views import View
 from django.shortcuts import render
-from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from main.models import Movie
@@ -61,13 +60,14 @@ class MovieTopList(APIView):
     def get(self, request):
         amount = self.validate_amount(self.request.query_params.get('amount', 10))
         result = {}
+        # cache.delete('top_5_films')
         if amount:
             result = cache.get(f'top_{amount}_films', {})
             if not result:
                 movies = Movie.objects.filter(year__isnull=False).order_by('-year').prefetch_related('links')[:amount]
                 serializer = MovieSerializer(movies, many=True)
                 result = serializer.data
-                cache.set(f'top_{amount}_films', result, 60*5)
+                cache.set(f'top_{amount}_films', result, 60*1)
         return Response(result)
 
     def validate_amount(self, amount):
@@ -77,3 +77,14 @@ class MovieTopList(APIView):
         except ValueError as exc:
             print(exc)
             return None
+
+
+class MovieSearchByNameListView(generics.ListAPIView):
+    """
+    List all movies starts with search
+    """
+    permission_classes = [permissions.AllowAny]
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^title']

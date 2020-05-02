@@ -48,6 +48,6 @@ class TmdbAPI:
                 result['poster_path'] = self.BASE_IMAGE_URL.format(size='w300', path=result['poster_path'])
         else:
             backdrop = data.get('backdrop_path', None)
-            result['backdrop_path'] = self.BASE_IMAGE_URL.format(size='w500', path=backdrop) if backdrop else backdrop
+            result['backdrop_path'] = self.BASE_IMAGE_URL.format(size='w780', path=backdrop) if backdrop else backdrop
 
         return result
