@@ -134,6 +134,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Bookmark(models.Model):
+    class Meta:
+        ordering = ['user_id', 'movie_id']
+
+    def __str__(self):
+        return f'{self.user_id}-{self.movie_id}'
+
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
     timestamp = models.PositiveIntegerField(null=True, blank=True)
