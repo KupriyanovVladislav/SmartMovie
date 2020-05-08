@@ -140,6 +140,6 @@ class Bookmark(models.Model):
     def __str__(self):
         return f'{self.user_id}-{self.movie_id}'
 
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     timestamp = models.PositiveIntegerField(null=True, blank=True)

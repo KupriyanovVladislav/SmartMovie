@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, Link
+from .models import Movie, Link, Bookmark
 from .models import User
 from rest_framework_jwt.settings import api_settings
 from .utils.tmdbApi import TmdbAPI
@@ -86,3 +86,28 @@ class UserSerializerWithToken(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+
+class BookmarkSerializer(serializers.ModelSerializer):
+    movie = MovieSerializer(read_only=True)
+    user_id = serializers.IntegerField(write_only=True)
+    movie_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Bookmark
+        fields = ('id', 'user_id', 'movie_id', 'timestamp', 'movie')
+
+    def save(self, **kwargs):
+        movie_id, user_id = self.validated_data['movie_id'], self.validated_data['user_id']
+        if Bookmark.objects.filter(movie_id=movie_id, user_id=user_id).exists():
+            self.instance = Bookmark.objects.get(movie_id=movie_id, user_id=user_id)
+        super().save(**kwargs)
+
+    def create(self, validated_data):
+        bookmark = Bookmark(
+            movie_id=validated_data['movie_id'],
+            user_id=validated_data['user_id'],
+            timestamp=validated_data['timestamp'],
+        )
+        bookmark.save()
+        return bookmark

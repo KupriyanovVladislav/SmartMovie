@@ -5,9 +5,11 @@ from django.views import View
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from main.models import Movie
-from main.serializers import MovieSerializer, MovieMoreInfoSerializer
+from main.models import Movie, Bookmark
+from main.serializers import MovieSerializer, MovieMoreInfoSerializer, BookmarkSerializer
 from django.core.cache import cache
+from time import time
+from ..recommendations.recommedations import SimilarMoviesSearcher
 
 
 logger = logging.getLogger(__name__)
@@ -88,3 +90,59 @@ class MovieSearchByNameListView(generics.ListAPIView):
     serializer_class = MovieSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['^title']
+
+
+class BookmarkList(APIView):
+    def get(self, request):
+        bookmarks = Bookmark.objects.filter(user_id=request.user.id)
+        serializer = BookmarkSerializer(bookmarks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        data = request.data
+        data['user_id'] = request.user.id
+        data['timestamp'] = int(time())
+        serializer = BookmarkSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookmarkDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Bookmark.objects.get(id=pk)
+        except Bookmark.DoesNotExist:
+            raise Http404
+
+    def delete(self, request, pk):
+        bookmark = self.get_object(pk)
+        bookmark.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SimilarMoviesView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        similar_movies = self.find_similar_movies()
+        similar_movies = Movie.objects.filter(title__in=similar_movies).prefetch_related('links')
+        serializer = MovieSerializer(similar_movies, many=True)
+        return Response(serializer.data)
+
+    def find_similar_movies(self):
+        title = self.request.query_params.get('title', None)
+        amount = self.validate_amount(self.request.query_params.get('top', 5))
+        searcher = SimilarMoviesSearcher()
+        similar_movies = searcher.get(title, int(amount))
+        return similar_movies
+
+    def validate_amount(self, amount):
+        result = 10
+        try:
+            result = int(amount)
+        finally:
+            return result
