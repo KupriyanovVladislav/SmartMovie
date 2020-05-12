@@ -1,5 +1,5 @@
 import logging
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from rest_framework import status, filters, permissions, generics
 from django.views import View
 from django.shortcuts import render
@@ -9,7 +9,7 @@ from main.models import Movie, Bookmark
 from main.serializers import MovieSerializer, MovieMoreInfoSerializer, BookmarkSerializer
 from django.core.cache import cache
 from time import time
-from ..recommendations.recommedations import SimilarMoviesSearcher
+from ..recommendations import searcher
 
 
 logger = logging.getLogger(__name__)
@@ -130,13 +130,12 @@ class SimilarMoviesView(APIView):
     def get(self, request):
         similar_movies = self.find_similar_movies()
         similar_movies = Movie.objects.filter(title__in=similar_movies).prefetch_related('links')
-        serializer = MovieSerializer(similar_movies, many=True)
+        serializer = MovieSerializer(similar_movies.reverse(), many=True)
         return Response(serializer.data)
 
     def find_similar_movies(self):
         title = self.request.query_params.get('title', None)
         amount = self.validate_amount(self.request.query_params.get('top', 5))
-        searcher = SimilarMoviesSearcher()
         similar_movies = searcher.get(title, int(amount))
         return similar_movies
 
