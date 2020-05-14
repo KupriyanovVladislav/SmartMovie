@@ -6,7 +6,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from main.models import Movie, Bookmark
-from main.serializers import MovieSerializer, MovieMoreInfoSerializer, BookmarkSerializer
+from main.serializers import MovieSerializer, MovieMoreInfoSerializer, BookmarkSerializer, RatingSerializer
 from django.core.cache import cache
 from time import time
 from ..recommendations import searcher
@@ -46,7 +46,7 @@ class MovieDetail(APIView):
 
     def get(self, request, pk, format=None):
         movie = self.get_object(pk)
-        serializer = MovieMoreInfoSerializer(movie)
+        serializer = MovieMoreInfoSerializer(movie, user=request.user)
         return Response(serializer.data)
 
     def delete(self, request, pk, format=None):
@@ -145,3 +145,18 @@ class SimilarMoviesView(APIView):
             result = int(amount)
         finally:
             return result
+
+
+class RatingList(APIView):
+    def post(self, request):
+        data = request.data
+        data['user_id'] = request.user.id
+        data['is_archived'] = False
+        data['timestamp'] = int(time())
+        serializer = RatingSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

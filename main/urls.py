@@ -14,4 +14,5 @@ urlpatterns = [
     path('users/', auth.UserList.as_view()),
     path('bookmarks/', views.BookmarkList.as_view()),
     path('bookmarks/<int:pk>', views.BookmarkDetail.as_view()),
+    path('ratings/', views.RatingList.as_view()),
 ]

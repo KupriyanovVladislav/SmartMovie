@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, Link, Bookmark
+from .models import Movie, Link, Bookmark, Rating
 from .models import User
 from rest_framework_jwt.settings import api_settings
 from .utils.tmdbApi import TmdbAPI
@@ -39,6 +39,7 @@ class MovieMoreInfoSerializer(serializers.ModelSerializer):
         )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.tmdb_api_handler = TmdbAPI()
 
@@ -50,7 +51,19 @@ class MovieMoreInfoSerializer(serializers.ModelSerializer):
                 result[field] = getattr(instance, field)
             else:
                 result[field] = tmdb_data.get(field, None)
+
         result['links'] = LinkSerializer(result['links']).data
+        result['rating'] = None
+        result['is_bookmark'] = False
+        if self.user:
+            user_id = self.user.id
+            movie_id = instance.movie_id
+            if Rating.objects.filter(user_id=user_id, movie_id=movie_id).exists():
+                rating = Rating.objects.get(user_id=user_id, movie_id=instance.movie_id)
+                result['rating'] = rating.rating
+            if Bookmark.objects.filter(user_id=user_id, movie_id=movie_id).exists():
+                result['is_bookmark'] = True
+
         return result
 
 
@@ -111,3 +124,18 @@ class BookmarkSerializer(serializers.ModelSerializer):
         )
         bookmark.save()
         return bookmark
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    movie_id = serializers.IntegerField(write_only=True)
+    user_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Rating
+        fields = ('rating', 'user_id', 'movie_id', 'timestamp', 'is_archived')
+
+    def save(self, **kwargs):
+        movie_id, user_id = self.validated_data['movie_id'], self.validated_data['user_id']
+        if Rating.objects.filter(movie_id=movie_id, user_id=user_id).exists():
+            self.instance = Rating.objects.get(movie_id=movie_id, user_id=user_id)
+        super().save(**kwargs)

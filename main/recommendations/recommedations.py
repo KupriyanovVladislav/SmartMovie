@@ -11,7 +11,7 @@ class SimilarMoviesSearcher:
     """
     RATING_COLS = ('user_id', 'movie_id', 'rating')
     MOVIE_COLS = ('movie_id', 'title')
-    RATING_COUNT = 20
+    RATING_COUNT = 50
 
     def __init__(self):
         self.ratings = self._init_ratings()
