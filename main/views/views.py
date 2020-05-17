@@ -128,14 +128,15 @@ class SimilarMoviesView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        similar_movies = self.find_similar_movies()
-        similar_movies = Movie.objects.filter(title__in=similar_movies).prefetch_related('links')
-        serializer = MovieSerializer(similar_movies.reverse(), many=True)
+        ordered_similar_movie_titles = self.find_similar_movies()
+        similar_movies = Movie.objects.filter(title__in=ordered_similar_movie_titles).select_related('links')
+        ordered_similar_movies = [similar_movies.get(title=title) for title in ordered_similar_movie_titles]
+        serializer = MovieSerializer(ordered_similar_movies, many=True)
         return Response(serializer.data)
 
     def find_similar_movies(self):
         title = self.request.query_params.get('title', None)
-        amount = self.validate_amount(self.request.query_params.get('top', 5))
+        amount = self.validate_amount(self.request.query_params.get('top', 10))
         similar_movies = searcher.get(title, int(amount))
         return similar_movies
 
