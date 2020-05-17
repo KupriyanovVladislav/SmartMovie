@@ -66,13 +66,13 @@ class SimilarMoviesSearcher:
 
         def comparator(movie_1, movie_2):
             if movie_1[0].startswith(first_word) and movie_2[0].startswith(first_word):
-                compare_values(movie_1[1], movie_2[1])
+                return compare_values(movie_1[1], movie_2[1])
             elif movie_1[0].startswith(first_word):
                 return 1
             elif movie_2[0].startswith(first_word):
                 return -1
             else:
-                compare_values(movie_1[1], movie_2[1])
+                return compare_values(movie_1[1], movie_2[1])
 
         def compare_values(val_1, val_2):
             if val_1 > val_2:
