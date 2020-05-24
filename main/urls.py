@@ -15,4 +15,5 @@ urlpatterns = [
     path('bookmarks/', views.BookmarkList.as_view()),
     path('bookmarks/<int:pk>', views.BookmarkDetail.as_view()),
     path('ratings/', views.RatingList.as_view()),
+    path('users/recommendations/', views.SimilarMoviesForUserView.as_view()),
 ]

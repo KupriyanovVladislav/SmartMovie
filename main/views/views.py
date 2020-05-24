@@ -161,3 +161,23 @@ class RatingList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SimilarMoviesForUserView(APIView):
+    def get(self, request):
+        similar_movies = self.find_similar_movies(request.user.id)
+        similar_movies = Movie.objects.filter(title__in=similar_movies).select_related('links')
+        serializer = MovieSerializer(similar_movies, many=True)
+        return Response(serializer.data)
+
+    def find_similar_movies(self, user_id):
+        amount = self.validate_amount(self.request.query_params.get('top', 10))
+        similar_movies = searcher.get_for_user(user_id)
+        return similar_movies
+
+    def validate_amount(self, amount):
+        result = 10
+        try:
+            result = int(amount)
+        finally:
+            return result
