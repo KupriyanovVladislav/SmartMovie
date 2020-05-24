@@ -20,7 +20,6 @@ class SimilarMoviesSearcher:
         self.search_table = self._init_search_table()
         self.popular_movies = self._init_popular_movies()
         self.popular_movie_user_table = self._init_popular_movie_user_table()
-        # self.corr_table = self._init_corr_table()
 
     def _init_ratings(self):
         """
@@ -78,15 +77,6 @@ class SimilarMoviesSearcher:
         popular_ratings = self.popular_movies.join(ratings_)
         popular_movie_ratings = popular_ratings.pivot_table(index=['user_id'], columns=['title'], values='rating')
         return popular_movie_ratings
-
-    def _init_corr_table(self):
-        if os.path.exists('main/recommendations/movieCorr.csv'):
-            result = pd.read_csv('main/recommendations/movieCorr.csv')
-        else:
-            result = self.search_table.corr(method='pearson', min_periods=100)
-            result.to_csv('main/recommendations/movieCorr.csv')
-        # result = self.popular_movie_user_table.corr(method='pearson', min_periods=100)
-        return result
 
     def _get_corr_movies(self, movies: list):
         result = None
